@@ -1,0 +1,92 @@
+name: >-
+  web-app-dev_env_fed2bc2d-2e09-42a6-9b93-e386e63a9229_app_1869a6c5-8461-4d32-a17f-29d374436afe
+  Pipeline (Skyu Generated)
+'on':
+  push:
+    branches:
+      - master
+  workflow_dispatch: {}
+  repository_dispatch:
+    types: pipeline_8c816b44-cc94-4d75-9391-3db9caa9b0a1
+env:
+  ENCODED_PIPELINE_SECRET: >-
+    ${{secrets.WEBAPPREACTTYPESCRIPT_ENV_FED2BC2D2E0942A69B93E386E63A9229_APP_1869A6C584614D32A17F29D374436AFE_WEBAPPDEV_ENV_FED2BC2D2E0942A69B93E386E63A9229_APP_1869A6C584614D32A17F29D374436AFE}}
+  BUILD_ENVIRONEMENT_VERSION: latest
+  WEB_APP_BUILD_FOLDER: build
+  WEB_APP_S3_SYNC_URL: >-
+    s3://skyu-project-84dd6b29-7059-49fc-9ac2-5694fc59b64d-webapps/dev/web-app-2023-01-27
+  WEB_APP_INSTALL_DEPS_COMMAND: npm i
+  WEB_APP_BUILD_COMMAND: npm run build
+  IMAGE_TAG: ${{github.event.client_payload.commitId || github.sha}}
+  DEPLOY_STEP_SHOULD_DEPLOY: 'false'
+jobs:
+  build-and-sync-web-app:
+    name: Build And Sync Web App
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Start
+        run: |2-
+
+              echo " Starting GitHub Action!" && 
+              echo "STEPS_CAN_PROCEED=true" >> $GITHUB_ENV
+              
+      - name: 'Run :: Checkout repository'
+        uses: actions/checkout@v2
+      - name: 'Run :: Checkout Specific Commit'
+        if: ${{ github.event.client_payload.commitId != null }}
+        run: git checkout ${{ github.event.client_payload.commitId }}
+      - name: 'Run :: Decoding Secrets 18dd7bb6-0a5a-49e4-8ad0-94104a1e9b80'
+        run: |2-
+
+                  if [ ! -x "$(command -v jq)" ]; then
+                    echo "jq not found, installing..."
+                    sudo apt-get update
+                    sudo apt-get install -y jq
+                  fi
+                  echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
+                
+      - name: 'Run :: Configure AWS credentials b65a8d3d-1ad0-4427-bf02-dcabb8f6fa4f'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.roleARN }}
+          role-session-name: skyu-pipeline-assume-role-session
+          aws-region: ${{ env.region }}
+      - name: 'Run :: Set up Node.js'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.BUILD_ENVIRONEMENT_VERSION }}
+      - name: 'Run :: Install Web App Dependancies'
+        run: ${{ env.WEB_APP_INSTALL_DEPS_COMMAND }}
+      - name: 'Run :: Build Web App'
+        run: ${{ env.WEB_APP_BUILD_COMMAND }} && ls -R
+      - name: 'Run :: Sync Web App with S3 bucket'
+        run: >-
+          aws s3 sync ${{ env.WEB_APP_BUILD_FOLDER }} ${{
+          env.WEB_APP_S3_SYNC_URL }}
+  deploy-web-app:
+    name: Deploy Web App
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Run :: Decoding Secrets b7a50a03-a284-4f48-a22f-03e57b7551dd'
+        run: |2-
+
+                  if [ ! -x "$(command -v jq)" ]; then
+                    echo "jq not found, installing..."
+                    sudo apt-get update
+                    sudo apt-get install -y jq
+                  fi
+                  echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
+                
+      - name: 'Run :: Deploy and Notify Resource Service'
+        run: |2-
+
+              response=$(curl -d "appType=WebApp&appVersionId=${{ env.DEPLOYMENT_APP_VERSION_ID }}&tag=${{ env.IMAGE_TAG }}&containerName=${{ env.DEPLOYMENT_CONTAINER_NAME }}&shouldDeploy=${{env.DEPLOY_STEP_SHOULD_DEPLOY}}&pipelineRunId=${{ github.run_id }}&commitDetails[commitHash]=${{ github.sha }}&commitDetails[commitAvatar]=https://github.com/${{ github.event.head_commit.author.name }}.png&commitDetails[commitTime]=${{ github.event.head_commit.timestamp }}&commitDetails[commitMessage]=\"${{ github.event.head_commit.message }}\"&commitDetails[commitUser]=${{ github.event.head_commit.author.name }}" -X PATCH -H 'Authorization: ${{ env.SERVICE_ACC_ACCESS_TOKEN }}' -H 'x-organization-id: ${{ env.DEPLOYMENT_ORGANIZATION_ID }}' -H 'x-project-id: ${{ env.DEPLOYMENT_PROJECT_ID }}' -H 'x-environment-id: ${{ env.DEPLOYMENT_ENVIRONMENT_ID }}' -H 'x-application-id: ${{ env.DEPLOYMENT_APPLICATION_ID }}' -H 'x-auth-by: sa' -H 'Content-Type: application/x-www-form-urlencoded' '${{ env.DEPLOYMENT_ENDPOINT }}')
+
+              if echo "$response" | grep -q '"success":true'; then
+                echo "SUCCESS :: $response"
+              else
+                echo "FAILED :: $response"
+              fi
+            
