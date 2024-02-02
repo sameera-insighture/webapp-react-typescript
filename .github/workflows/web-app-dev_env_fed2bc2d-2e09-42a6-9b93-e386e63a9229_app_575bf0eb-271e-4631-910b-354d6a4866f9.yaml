@@ -11,6 +11,7 @@ name: >-
 env:
   ENCODED_PIPELINE_SECRET: >-
     ${{secrets.WEBAPPREACTTYPESCRIPT_ENV_FED2BC2D2E0942A69B93E386E63A9229_APP_575BF0EB271E4631910B354D6A4866F9_WEBAPPDEV_ENV_FED2BC2D2E0942A69B93E386E63A9229_APP_575BF0EB271E4631910B354D6A4866F9}}
+  dfdf: dfdffdf
   BUILD_ENVIRONEMENT_VERSION: latest
   WEB_APP_BUILD_FOLDER: build
   WEB_APP_S3_SYNC_URL: >-
@@ -38,7 +39,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets 3fe7fe68-fdcb-4c44-a29f-8bc48ed20ccb'
+      - name: 'Run :: Decoding Secrets 9463ba18-a5ce-4a18-bf30-b223cfb644f9'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -48,12 +49,14 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 08699964-9e53-40d7-a15a-5ab8d9f4bf16'
+      - name: 'Run :: Configure AWS credentials 5650a770-b176-440f-8df8-8ad261002769'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
           role-session-name: skyu-pipeline-assume-role-session
           aws-region: ${{ env.region }}
+      - name: TempName
+        run: dfdfdf
       - name: 'Run :: Set up Node.js'
         uses: actions/setup-node@v4
         with:
@@ -71,7 +74,7 @@ jobs:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
-      - name: 'Run :: Decoding Secrets 546c077e-f83b-4102-931d-30bee384ca7a'
+      - name: 'Run :: Decoding Secrets d1ab1280-3792-43af-8559-d7dd5d6b367d'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
