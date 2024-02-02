@@ -38,7 +38,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets 966185c4-5923-40be-97b3-324333c72064'
+      - name: 'Run :: Decoding Secrets 071e8007-0dec-451c-8b6f-faffd5084c92'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -48,12 +48,14 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 6dbf547f-df5c-414e-9635-8908f13cb220'
+      - name: 'Run :: Configure AWS credentials 9b1036ed-b36a-4a3b-890e-b937ac03feb2'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
           role-session-name: skyu-pipeline-assume-role-session
           aws-region: ${{ env.region }}
+      - name: Custom Step 1
+        run: run command
       - name: 'Run :: Set up Node.js'
         uses: actions/setup-node@v4
         with:
@@ -71,7 +73,7 @@ jobs:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
-      - name: 'Run :: Decoding Secrets 368510c6-c920-46c6-83a6-bcd29de6d0c4'
+      - name: 'Run :: Decoding Secrets fe12637d-1a73-4be0-9671-22f409ac10af'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
