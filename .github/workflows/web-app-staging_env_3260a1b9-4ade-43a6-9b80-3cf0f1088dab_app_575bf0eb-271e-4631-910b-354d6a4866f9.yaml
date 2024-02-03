@@ -14,7 +14,7 @@ env:
     ${{secrets.WEBAPPREACTTYPESCRIPT_ENV_3260A1B94ADE43A69B803CF0F1088DAB_APP_575BF0EB271E4631910B354D6A4866F9_WEBAPPSTAGING_ENV_3260A1B94ADE43A69B803CF0F1088DAB_APP_575BF0EB271E4631910B354D6A4866F9}}
   BUILD_ENVIRONEMENT_VERSION: latest
   WEB_APP_BUILD_FOLDER: build
-  WEB_APP_S3_SYNC_URL: >-
+  S3_SYNC_URL: >-
     s3://skyu-project-84dd6b29-7059-49fc-9ac2-5694fc59b64d-webapps/staging/sameera-webaoo-2024-01-27
   WEB_APP_INSTALL_DEPS_COMMAND: npm i
   WEB_APP_BUILD_COMMAND: npm run build
@@ -39,7 +39,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets df806a59-7722-4c81-9c3d-80b9b3c0a246'
+      - name: 'Run :: Decoding Secrets c6ba12a7-5038-41a3-bb47-23238f509e71'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -49,7 +49,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 1bd6162e-e6f2-447b-afe6-7da95bafa067'
+      - name: 'Run :: Configure AWS credentials c79ec6d6-fe21-437c-a030-c10908d7b207'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -64,15 +64,13 @@ jobs:
       - name: 'Run :: Build Web App'
         run: ${{ env.WEB_APP_BUILD_COMMAND }} && ls -R
       - name: 'Run :: Sync Web App with S3 bucket'
-        run: >-
-          aws s3 sync ${{ env.WEB_APP_BUILD_FOLDER }} ${{
-          env.WEB_APP_S3_SYNC_URL }}
+        run: aws s3 sync ${{ env.WEB_APP_BUILD_FOLDER }} ${{ env.S3_SYNC_URL }}
   deploy-web-app:
     name: Deploy Web App
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
-      - name: 'Run :: Decoding Secrets c77ee35a-71e7-4715-b18e-9c8b8aed021d'
+      - name: 'Run :: Decoding Secrets a54b9b0e-ab0d-4b1b-b5cd-e05ba73c93d2'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
