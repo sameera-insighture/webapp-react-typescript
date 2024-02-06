@@ -23,6 +23,7 @@ env:
   VITE_REGION: us-east-1
   test1: test1
   DEPLOY_STEP_SHOULD_DEPLOY: 'false'
+  key1: val1
 jobs:
   build-and-sync-web-app:
     name: Build And Sync Web App
@@ -40,7 +41,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets c4a2e3e6-1621-4573-993e-30d873fe7276'
+      - name: 'Run :: Decoding Secrets e1a37257-7676-4b8f-a985-167cd2bf6011'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -50,7 +51,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials bdb0597e-1f7d-4bd4-b41d-3aba68c9836e'
+      - name: 'Run :: Configure AWS credentials c833d734-ceeb-44d8-96ab-05fdd189b87f'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -71,7 +72,7 @@ jobs:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
-      - name: 'Run :: Decoding Secrets 51aaeb8d-3e1c-45f7-8717-f0867b37b5e9'
+      - name: 'Run :: Decoding Secrets 5a9d2025-5645-4726-a8a9-166817a83d45'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -92,3 +93,5 @@ jobs:
                 echo "FAILED :: $response"
               fi
             
+      - name: stepnew1
+        run: run
