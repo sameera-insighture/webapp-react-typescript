@@ -13,11 +13,12 @@ env:
     ${{secrets.WEBAPPREACTTYPESCRIPT_ENV_FED2BC2D2E0942A69B93E386E63A9229_APP_1869A6C584614D32A17F29D374436AFE_WEBAPPDEV_ENV_FED2BC2D2E0942A69B93E386E63A9229_APP_1869A6C584614D32A17F29D374436AFE}}
   BUILD_ENVIRONEMENT_VERSION: latest
   WEB_APP_BUILD_FOLDER: build
-  WEB_APP_S3_SYNC_URL: >-
+  S3_SYNC_URL: >-
     s3://skyu-project-84dd6b29-7059-49fc-9ac2-5694fc59b64d-webapps/dev/web-app-2023-01-27
   WEB_APP_INSTALL_DEPS_COMMAND: npm i
   WEB_APP_BUILD_COMMAND: npm run build
   IMAGE_TAG: ${{github.event.client_payload.commitId || github.sha}}
+  key1: val1
   DEPLOY_STEP_SHOULD_DEPLOY: 'false'
 jobs:
   build-and-sync-web-app:
@@ -36,7 +37,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets 18dd7bb6-0a5a-49e4-8ad0-94104a1e9b80'
+      - name: 'Run :: Decoding Secrets aea51590-1e4a-47bf-aaa9-86032380a048'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -46,7 +47,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials b65a8d3d-1ad0-4427-bf02-dcabb8f6fa4f'
+      - name: 'Run :: Configure AWS credentials 0e789f2d-14d6-4f20-9f28-64798969fecc'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -61,15 +62,15 @@ jobs:
       - name: 'Run :: Build Web App'
         run: ${{ env.WEB_APP_BUILD_COMMAND }} && ls -R
       - name: 'Run :: Sync Web App with S3 bucket'
-        run: >-
-          aws s3 sync ${{ env.WEB_APP_BUILD_FOLDER }} ${{
-          env.WEB_APP_S3_SYNC_URL }}
+        run: aws s3 sync ${{ env.WEB_APP_BUILD_FOLDER }} ${{ env.S3_SYNC_URL }}
+      - name: Step Name 1
+        run: run
   deploy-web-app:
     name: Deploy Web App
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
-      - name: 'Run :: Decoding Secrets b7a50a03-a284-4f48-a22f-03e57b7551dd'
+      - name: 'Run :: Decoding Secrets f824b1c4-a95b-4a92-aeb7-40b441d1f5f4'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
