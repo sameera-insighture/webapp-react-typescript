@@ -11,17 +11,17 @@ name: >-
 env:
   ENCODED_PIPELINE_SECRET: >-
     ${{secrets.WEBAPPREACTTYPESCRIPT_ENV_FED2BC2D2E0942A69B93E386E63A9229_APP_575BF0EB271E4631910B354D6A4866F9_WEBAPPDEV_ENV_FED2BC2D2E0942A69B93E386E63A9229_APP_575BF0EB271E4631910B354D6A4866F9}}
-  dfdf: dfdffdf
   BUILD_ENVIRONEMENT_VERSION: latest
   WEB_APP_BUILD_FOLDER: build
-  WEB_APP_S3_SYNC_URL: >-
+  S3_SYNC_URL: >-
     s3://skyu-project-84dd6b29-7059-49fc-9ac2-5694fc59b64d-webapps/dev/sameera-webaoo-2024-01-27
   WEB_APP_INSTALL_DEPS_COMMAND: npm i
   WEB_APP_BUILD_COMMAND: npm run build
+  IMAGE_TAG: ${{github.event.client_payload.commitId || github.sha}}
   VITE_ENV: dev
   VITE_REGION: us-east-1
-  IMAGE_TAG: ${{github.event.client_payload.commitId || github.sha}}
   DEPLOY_STEP_SHOULD_DEPLOY: 'false'
+  sds: sdsd
 jobs:
   build-and-sync-web-app:
     name: Build And Sync Web App
@@ -39,7 +39,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets 9463ba18-a5ce-4a18-bf30-b223cfb644f9'
+      - name: 'Run :: Decoding Secrets 7872c250-35e1-4c6c-a519-d7e01bc1d60f'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -49,14 +49,14 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 5650a770-b176-440f-8df8-8ad261002769'
+      - name: 'Run :: Configure AWS credentials 6751b7b4-51a5-47ef-ac57-b61eb30fd14e'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
           role-session-name: skyu-pipeline-assume-role-session
           aws-region: ${{ env.region }}
-      - name: TempName
-        run: dfdfdf
+      - run: dfdfdf
+        name: TempName
       - name: 'Run :: Set up Node.js'
         uses: actions/setup-node@v4
         with:
@@ -66,15 +66,13 @@ jobs:
       - name: 'Run :: Build Web App'
         run: ${{ env.WEB_APP_BUILD_COMMAND }} && ls -R
       - name: 'Run :: Sync Web App with S3 bucket'
-        run: >-
-          aws s3 sync ${{ env.WEB_APP_BUILD_FOLDER }} ${{
-          env.WEB_APP_S3_SYNC_URL }}
+        run: aws s3 sync ${{ env.WEB_APP_BUILD_FOLDER }} ${{ env.S3_SYNC_URL }}
   deploy-web-app:
     name: Deploy Web App
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
-      - name: 'Run :: Decoding Secrets d1ab1280-3792-43af-8559-d7dd5d6b367d'
+      - name: 'Run :: Decoding Secrets 275c1429-26ce-4854-bdc5-b2bb7489516b'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
